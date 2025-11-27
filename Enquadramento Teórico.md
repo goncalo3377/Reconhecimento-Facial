@@ -43,3 +43,48 @@ O FaceNet não tem capacidade de identificar caras por isso se não houver pré 
 
 O MTCNN varre a imagem, encontra o quadrado onde está o rosto e, crucialmente, encontra 5 pontos (olhos, nariz, boca).
 
+## Modificar o FaceNet para Classificação
+
+Até agora, estávamos a usar o FaceNet no modo **Metric Learning** (Comparação):
+
+- **Entrada:** Foto.
+    
+- **Saída:** Vetor de 128 números.
+    
+- **Decisão:** Calculamos a distância matemática.
+    
+
+O que você quer fazer agora é **Classification** (Classificação):
+
+- **Entrada:** Foto.
+    
+- **Saída:** Probabilidade (Ex: 99% Pedro, 1% João).
+    
+- **Decisão:** A própria rede diz quem é.
+
+### 2. A Arquitetura: Como modificar o FaceNet
+
+Para fazer isso, precisamos "operar" o cérebro do FaceNet.
+
+1. **Congelar o "Corpo" (Backbone):** Pegamos no InceptionResnetV1 pré-treinado (vggface2). Não queremos estragar o que ele já sabe sobre o que é uma sobrancelha ou um nariz. Então, "congelamos" esses pesos.
+    
+2. **Cortar a "Cabeça":** Removemos a última camada que gera os vetores (embeddings).
+    
+3. **Colocar uma Nova "Cabeça":** Adicionamos uma camada linear simples (Dense/Fully Connected) que tem as **saídas**  (Pedro e João).
+
+
+|                           | Vantagens                                                          | Desvantagens                                                                         |
+| ------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| Classificação (Sua ideia) | Muito preciso com muitas fotos. A resposta é instantânea (0 ou 1). | **Inflexível.** Se entrar uma 3ª pessoa ("Maria"), você tem de re-treinar a rede.    |
+| Embeddings (Anterior)     | Flexível. Se entrar a Maria, basta adicionar 1 foto dela ao banco. | Pode ser menos preciso se a iluminação variar muito e não tivermos um bom threshold. |
+
+
+
+```mermaid
+graph LR
+    A[Início] --> B(Processo)
+
+```
+
+
+
